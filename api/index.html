@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DTMF Uygulaması — BIL216</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --input-bg: #1f1f1f;
+  --border: #333333;
+  --accent: #ff5e00;        /* Bright Orange */
+  --accent-hover: #ff8800;  /* Lighter Orange */
+  --accent-soft: rgba(255, 94, 0, 0.15); /* Soft Orange Background */
+  --accent2: #00e5ff;       /* Cyan */
+  --text: #e5e5e5;
+  --dim: #888888;
+  --radius: 8px;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.8), 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; line-height: 1.5; }
+.wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+header { text-align: center; margin-bottom: 40px; }
+.badge { display: inline-block; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 6px 16px; border-radius: 20px; margin-bottom: 16px; border: 1px solid rgba(255, 94, 0, 0.3); }
+h1 { font-size: 36px; font-weight: 700; color: #ffffff; margin-bottom: 8px; letter-spacing: -0.5px; }
+.sub { font-size: 14px; color: var(--dim); }
+.tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+.tb { flex: 1; padding: 12px; background: transparent; border: none; border-radius: var(--radius); color: var(--dim); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.tb.active { color: var(--accent-hover); background: var(--accent-soft); }
+.tb:hover:not(.active) { background: var(--border); color: var(--text); }
+.panel { display: none; animation: fadeIn 0.3s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
+.clabel { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+.clabel::before { content: ''; display: inline-block; width: 4px; height: 14px; background: var(--accent); border-radius: 2px; }
+textarea, input[type=text] { width: 100%; background: var(--input-bg); border: 1px solid var(--border); border-radius: var(--radius); color: #ffffff; font-family: inherit; font-size: 15px; padding: 16px; outline: none; transition: all 0.2s; resize: vertical; }
+textarea:focus, input:focus { border-color: var(--accent); background: #262626; box-shadow: 0 0 0 3px rgba(255, 94, 0, 0.2); }
+textarea::placeholder { color: #666666; }
+.btn-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+.btn { padding: 12px 24px; border: none; border-radius: var(--radius); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.bp { background: var(--accent); color: #000000; }
+.bp:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(255, 94, 0, 0.3); }
+.bg { background: var(--surface); color: var(--accent); border: 1px solid var(--accent); }
+.bg:hover { background: var(--accent-soft); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; border-color: var(--border); color: var(--dim); }
+img.plot { width: 100%; border: 1px solid var(--border); border-radius: var(--radius); display: block; margin-top: 12px; }
+.prog-wrap { background: var(--input-bg); border-radius: 4px; height: 6px; margin-top: 16px; overflow: hidden; border: 1px solid var(--border); }
+.prog { height: 100%; background: var(--accent); width: 0%; transition: width 0.3s ease; border-radius: 4px; box-shadow: 0 0 10px var(--accent); }
+.char-boxes { display: flex; flex-wrap: wrap; gap: 8px; min-height: 44px; }
+.cbox { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border); border-radius: 6px; font-size: 15px; font-weight: 600; background: var(--input-bg); color: var(--dim); transition: all 0.2s; }
+.cbox.active { border-color: var(--accent-hover); color: #000000; background: var(--accent-hover); transform: scale(1.05); box-shadow: 0 0 12px rgba(255, 136, 0, 0.4); }
+.decode-out { background: var(--input-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; min-height: 64px; font-size: 24px; font-weight: 700; letter-spacing: 2px; word-break: break-all; margin-top: 12px; color: #ffffff; }
+.decode-out span { display: inline-block; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; opacity: 0; }
+@keyframes popIn { from { opacity: 0; transform: scale(0.8); color: var(--accent); } to { opacity: 1; transform: scale(1); color: #ffffff; } }
+.upload-z { border: 2px dashed var(--border); border-radius: var(--radius); padding: 40px 20px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--input-bg); }
+.upload-z:hover, .upload-z.drag { border-color: var(--accent); background: var(--accent-soft); }
+.upload-z .ico { font-size: 32px; margin-bottom: 12px; color: var(--accent); }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; color: var(--accent); border-bottom: 2px solid var(--border); }
+td { padding: 12px 16px; border-bottom: 1px solid var(--border); color: var(--text); }
+tr:hover td { background: var(--input-bg); }
+td.cc { font-weight: 600; color: #ffffff; }
+td.fc { font-family: monospace; color: var(--dim); }
+.status { position: fixed; bottom: 0; left: 0; right: 0; background: #000000; border-top: 1px solid var(--border); padding: 12px 24px; font-size: 13px; font-weight: 500; color: var(--dim); display: flex; align-items: center; gap: 12px; z-index: 100; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--dim); flex-shrink: 0; }
+.dot.a { background: var(--accent); animation: pulse 1.5s infinite; }
+.dot.e { background: #e74c3c; }
+.dot.s { background: var(--accent2); }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 94, 0, 0.5); } 70% { box-shadow: 0 0 0 6px rgba(255, 94, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 94, 0, 0); } }
+audio { width: 100%; margin-top: 16px; outline: none; border-radius: var(--radius); opacity: 0.8; filter: sepia(100%) hue-rotate(345deg) saturate(300%) brightness(0.9) contrast(1.2) invert(1); }
+.acc { margin-top: 12px; font-size: 13px; font-weight: 500; color: var(--dim); }
+.acc span { color: var(--accent); font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="badge">BIL216 · Ödev 2</div>
+    <h1>DTMF Sinyal İşleme Paneli</h1>
+    <p class="sub">Metinden Sese &amp; Sesten Metine Kod Çözme Uygulaması</p>
+  </header>
+
+  <div class="tabs">
+    <button class="tb active" onclick="tab('encode',this)">Sinyal Sentezleme (Encode)</button>
+    <button class="tb" onclick="tab('decode',this)">Sinyal Çözümleme (Decode)</button>
+    <button class="tb" onclick="tab('freqtable',this)">Frekans Haritası</button>
+  </div>
+
+  <div class="panel active" id="tab-encode">
+    <div class="card">
+      <div class="clabel">Türkçe Metin Girişi</div>
+      <textarea id="enc-input" rows="3" placeholder="Sese dönüştürülecek metni girin... (örn: SİNYAL İŞLEME)"></textarea>
+      <div class="btn-row">
+        <button class="btn bp" onclick="doEncode()">Sentezle &amp; Üret</button>
+        <button class="btn bg" id="dl-btn" onclick="downloadWav()" disabled>WAV Dosyasını İndir</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">Kodlanan Karakterler</div>
+      <div class="char-boxes" id="char-boxes"></div>
+      <div class="prog-wrap"><div class="prog" id="prog-bar"></div></div>
+    </div>
+
+    <div class="card">
+      <div class="clabel">Zaman Boyutu (Dalga Formu)</div>
+      <img class="plot" id="wave-img" src="" alt="" style="display:none">
+    </div>
+
+    <div class="card">
+      <div class="clabel">Frekans Boyutu (FFT Spektrumu)</div>
+      <img class="plot" id="spec-img" src="" alt="" style="display:none">
+      <audio id="audio-player" controls style="display:none"></audio>
+    </div>
+  </div>
+
+  <div class="panel" id="tab-decode">
+    <div class="card">
+      <div class="clabel">WAV Dosyası Yükle</div>
+      <div class="upload-z" id="upz" onclick="document.getElementById('wav-in').click()"
+           ondragover="ev.preventDefault();this.classList.add('drag')"
+           ondragleave="this.classList.remove('drag')"
+           ondrop="dropF(event)">
+        <div class="ico">📂</div>
+        <div style="font-weight: 500; color: #ffffff;">WAV dosyasını seçin veya buraya sürükleyin</div>
+        <div style="font-size: 13px; margin-top: 6px;">ya da direkt olarak "Son Encode'u Çöz" butonunu kullanın</div>
+      </div>
+      <input type="file" id="wav-in" accept=".wav" style="display:none" onchange="pickFile(event)">
+      <div class="btn-row" style="margin-top:20px;">
+        <button class="btn bp" onclick="doDecode()">Dosyayı Analiz Et</button>
+        <button class="btn bg" onclick="decodeEncoded()">Son Encode'u Çöz</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="clabel">Çözümlenen Metin</div>
+      <div class="decode-out" id="dec-out"></div>
+      <div class="acc">Eşleşme Başarımı: <span id="acc-disp">—</span></div>
+    </div>
+    <div class="card">
+      <div class="clabel">Goertzel Algoritması Enerji Analizi</div>
+      <img class="plot" id="goertzel-img" src="" alt="" style="display:none">
+    </div>
+  </div>
+
+  <div class="panel" id="tab-freqtable">
+    <div class="card">
+      <div class="clabel">Karakter / Frekans Atamaları</div>
+      <div style="font-size:13px;color:var(--dim);margin-bottom:20px; padding: 12px; background: var(--input-bg); border-radius: var(--radius); border: 1px solid var(--border);">
+        Sinyal Formülü: <strong style="color:var(--accent)">s(t) = sin(2π·f₁·t) + sin(2π·f₂·t)</strong><br>
+        Örnekleme Hızı: <strong style="color:#fff">44100 Hz</strong> | Karakter Süresi: <strong style="color:#fff">40 ms</strong>
+      </div>
+      <table>
+        <thead><tr><th>Sıra</th><th>Karakter</th><th>Düşük Frekans (Hz)</th><th>Yüksek Frekans (Hz)</th></tr></thead>
+        <tbody>
+          {% for row in freq_table %}
+          <tr>
+            <td style="color:var(--dim)">{{loop.index}}</td>
+            <td class="cc">{{row.char}}</td>
+            <td class="fc">{{row.fl}}</td>
+            <td class="fc">{{row.fh}}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="status">
+  <div class="dot" id="sdot"></div>
+  <span id="stxt">Python Sunucusu Bekliyor...</span>
+</div>
+
+<script>
+let lastWavB64 = null;
+let selectedFile = null;
+
+function tab(id, btn) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+function setStatus(msg, type) {
+  document.getElementById('stxt').textContent = msg;
+  const d = document.getElementById('sdot');
+  d.className = 'dot' + (type ? ' '+type : '');
+}
+
+async function doEncode() {
+  const text = document.getElementById('enc-input').value.trim();
+  if (!text) { setStatus('Lütfen bir metin girin.', 'e'); return; }
+  setStatus('Sinyal sentezleniyor...', 'a');
+  try {
+    const res = await fetch('/encode', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({text})
+    });
+    const data = await res.json();
+    if (data.error) { setStatus(data.error,'e'); return; }
+
+    lastWavB64 = data.wav_b64;
+    document.getElementById('dl-btn').disabled = false;
+
+    const wi = document.getElementById('wave-img');
+    wi.src = 'data:image/png;base64,'+data.wave_img;
+    wi.style.display = 'block';
+
+    const si = document.getElementById('spec-img');
+    si.src = 'data:image/png;base64,'+data.spec_img;
+    si.style.display = 'block';
+
+    const ap = document.getElementById('audio-player');
+    ap.src = 'data:audio/wav;base64,'+data.wav_b64;
+    ap.style.display = 'block';
+
+    const boxes = document.getElementById('char-boxes');
+    boxes.innerHTML = '';
+    const boxEls = data.chars.map(c => {
+      const b = document.createElement('div');
+      b.className = 'cbox';
+      b.textContent = c.ch;
+      b.title = `${c.fl}Hz + ${c.fh}Hz`;
+      boxes.appendChild(b);
+      return b;
+    });
+
+    const totalMs = data.duration_ms;
+    boxEls.forEach((b, i) => {
+      setTimeout(() => {
+        boxEls.forEach(x=>x.classList.remove('active'));
+        b.classList.add('active');
+        const prog = ((i+1)/boxEls.length)*100;
+        document.getElementById('prog-bar').style.width = prog+'%';
+      }, i * (totalMs / boxEls.length));
+    });
+    setTimeout(()=>{
+      boxEls.forEach(x=>x.classList.remove('active'));
+    }, totalMs+200);
+
+    setStatus(`Sentezleme başarılı. Toplam: ${data.num_chars} karakter, Süre: ${data.duration_ms}ms`, 's');
+  } catch(e) { setStatus('Sunucu Hatası: '+e,'e'); }
+}
+
+function downloadWav() {
+  if (!lastWavB64) return;
+  const a = document.createElement('a');
+  a.href = 'data:audio/wav;base64,'+lastWavB64;
+  a.download = 'dtmf_sinyal.wav';
+  a.click();
+  setStatus('WAV dosyası indirildi.','s');
+}
+
+function pickFile(e) {
+  selectedFile = e.target.files[0];
+  if (selectedFile) {
+    document.getElementById('upz').innerHTML = `<div class="ico" style="color:var(--accent)">✓</div><div style="font-weight:600;color:#ffffff">${selectedFile.name}</div>`;
+    setStatus('Dosya yüklendi: '+selectedFile.name,'s');
+  }
+}
+
+function dropF(e) {
+  e.preventDefault();
+  document.getElementById('upz').classList.remove('drag');
+  selectedFile = e.dataTransfer.files[0];
+  if (selectedFile) {
+    document.getElementById('upz').innerHTML = `<div class="ico" style="color:var(--accent)">✓</div><div style="font-weight:600;color:#ffffff">${selectedFile.name}</div>`;
+    setStatus('Dosya yüklendi: '+selectedFile.name,'s');
+  }
+}
+
+async function decodeEncoded() {
+  if (!lastWavB64) { setStatus('Lütfen önce Encode sekmesinden bir sinyal üretin.','e'); return; }
+  const blob = b64ToBlob(lastWavB64, 'audio/wav');
+  selectedFile = new File([blob], 'encoded.wav', {type:'audio/wav'});
+  await doDecode();
+}
+
+function b64ToBlob(b64, type) {
+  const bin = atob(b64);
+  const arr = new Uint8Array(bin.length);
+  for (let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type});
+}
+
+async function doDecode() {
+  if (!selectedFile) { setStatus('Lütfen analiz edilecek bir WAV dosyası seçin.','e'); return; }
+  setStatus('Sinyal çözümleniyor...','a');
+  const fd = new FormData();
+  fd.append('file', selectedFile);
+  try {
+    const res = await fetch('/decode', {method:'POST', body:fd});
+    const data = await res.json();
+    if (data.error) { setStatus(data.error,'e'); return; }
+
+    const outEl = document.getElementById('dec-out');
+    outEl.innerHTML = '';
+    let i = 0;
+    const chars = [...data.text];
+    const iv = setInterval(()=>{
+      if (i>=chars.length){clearInterval(iv);return;}
+      const s = document.createElement('span');
+      s.textContent = chars[i];
+      outEl.appendChild(s);
+      i++;
+    }, 60);
+
+    if (data.goertzel_img) {
+      const gi = document.getElementById('goertzel-img');
+      gi.src = 'data:image/png;base64,'+data.goertzel_img;
+      gi.style.display = 'block';
+    }
+
+    const orig = document.getElementById('enc-input').value.toUpperCase();
+    if (orig && data.text) {
+      let correct=0;
+      for(let j=0;j<Math.min(orig.length,data.text.length);j++) if(orig[j]===data.text[j]) correct++;
+      const total = Math.max(orig.length,data.text.length);
+      document.getElementById('acc-disp').textContent = `%${(correct/total*100).toFixed(1)} (${correct}/${total} karakter)`;
+    }
+
+    setStatus(`Çözümleme tamamlandı.`, 's');
+  } catch(e) { setStatus('Sunucu Hatası: '+e,'e'); }
+}
+</script>
+</body>
+</html>

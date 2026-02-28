@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/bil216_dtmf_amber.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    { "src": "/encode", "dest": "/api/bil216_dtmf_amber.py" },
+    { "src": "/decode", "dest": "/api/bil216_dtmf_amber.py" },
+    { "src": "/freq_table", "dest": "/api/bil216_dtmf_amber.py" },
+    { "src": "/(.*)", "dest": "/api/bil216_dtmf_amber.py" }
+  ]
+}
