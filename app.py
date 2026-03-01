@@ -332,5 +332,4 @@ with open(os.path.join(_dir, "index.html"), "r", encoding="utf-8") as f:
 application = app # Bu satır zaten kodunda var, Gunicorn buna bakacak.
 
 if __name__ == '__main__':
-    app.run(debug=True) 
-  #123
+    app.run(debug=True)
