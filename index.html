@@ -6,55 +6,72 @@
 <title>DTMF Uygulaması — BIL216</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
+/* ── RENK PALETİ VE DEĞİŞKENLER ── */
 :root {
-  --bg: #0a0a0a;
-  --surface: #141414;
-  --input-bg: #1f1f1f;
-  --border: #333333;
-  --accent: #ff5e00;
-  --accent-hover: #ff8800;
-  --accent-soft: rgba(255, 94, 0, 0.15);
-  --accent2: #00e5ff;
-  --text: #e5e5e5;
-  --dim: #888888;
-  --radius: 8px;
+  --bg: #0a0a0a;             /* Sayfa arka planı */
+  --surface: #141414;        /* Kartların arka planı */
+  --input-bg: #1f1f1f;       /* Input ve kutu arkaplanları */
+  --border: #333333;         /* Sınır çizgisi rengi */
+  --accent: #ff5e00;         /* Ana vurgu rengi (Turuncu) */
+  --accent-hover: #ff8800;   /* Hover durumu için açık turuncu */
+  --accent-soft: rgba(255, 94, 0, 0.15); 
+  --accent2: #00e5ff;        /* İkincil vurgu (Cyan) */
+  --text: #e5e5e5;           /* Açık gri metin */
+  --dim: #888888;            /* Sönük/koyu gri metin */
+  --radius: 8px;             /* Yuvarlak köşe değeri */
   --shadow: 0 4px 12px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.6);
 }
+
+/* Genel sayfa reset ve font ayarları */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; min-height: 100vh; line-height: 1.5; }
 .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
 header { text-align: center; margin-bottom: 40px; }
+
+/* UI Elemanları */
 .badge { display: inline-block; font-size: 12px; font-weight: 600; color: var(--accent); background: var(--accent-soft); padding: 6px 16px; border-radius: 20px; margin-bottom: 16px; border: 1px solid rgba(255,94,0,0.3); }
 h1 { font-size: 36px; font-weight: 700; color: #ffffff; margin-bottom: 8px; letter-spacing: -0.5px; }
 .sub { font-size: 14px; color: var(--dim); }
+
+/* Sekmeler (Tabs) */
 .tabs { display: flex; gap: 8px; margin-bottom: 24px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
 .tb { flex: 1; padding: 12px; background: transparent; border: none; border-radius: var(--radius); color: var(--dim); font-family: inherit; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .tb.active { color: var(--accent-hover); background: var(--accent-soft); }
 .tb:hover:not(.active) { background: var(--border); color: var(--text); }
+
+/* İçerik Panelleri ve Animasyon */
 .panel { display: none; animation: fadeIn 0.3s ease; }
 .panel.active { display: block; }
 @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+
+/* Kart Tasarımları */
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; margin-bottom: 20px; box-shadow: var(--shadow); }
 .clabel { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
 .clabel::before { content:''; display:inline-block; width:4px; height:14px; background:var(--accent); border-radius:2px; }
+
+/* Input ve Butonlar */
 textarea, input[type=text] { width:100%; background:var(--input-bg); border:1px solid var(--border); border-radius:var(--radius); color:#ffffff; font-family:inherit; font-size:15px; padding:16px; outline:none; transition:all 0.2s; resize:vertical; }
 textarea:focus, input:focus { border-color:var(--accent); background:#262626; box-shadow:0 0 0 3px rgba(255,94,0,0.2); }
 textarea::placeholder { color:#666666; }
 .btn-row { display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; }
 .btn { padding:12px 24px; border:none; border-radius:var(--radius); font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; transition:all 0.2s; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
-.bp { background:var(--accent); color:#000000; }
+.bp { background:var(--accent); color:#000000; } /* Primary Button */
 .bp:hover { background:var(--accent-hover); transform:translateY(-1px); box-shadow:0 4px 12px rgba(255,94,0,0.3); }
-.bg { background:var(--surface); color:var(--accent); border:1px solid var(--accent); }
+.bg { background:var(--surface); color:var(--accent); border:1px solid var(--accent); } /* Secondary Button */
 .bg:hover { background:var(--accent-soft); }
 .btn:disabled { opacity:0.5; cursor:not-allowed; transform:none !important; border-color:var(--border); color:var(--dim); }
+
+/* Grafikler ve Çalma Çubuğu */
 img.plot { width:100%; border:1px solid var(--border); border-radius:var(--radius); display:block; margin-top:12px; }
 .prog-wrap { background:var(--input-bg); border-radius:4px; height:6px; margin-top:16px; overflow:hidden; border:1px solid var(--border); }
 .prog { height:100%; background:var(--accent); width:0%; transition:width 0.3s ease; border-radius:4px; box-shadow:0 0 10px var(--accent); }
+
+/* Encode Esnasında Yanan Harf Kutuları */
 .char-boxes { display:flex; flex-wrap:wrap; gap:8px; min-height:44px; }
 .cbox { width:36px; height:36px; display:flex; align-items:center; justify-content:center; border:1px solid var(--border); border-radius:6px; font-size:15px; font-weight:600; background:var(--input-bg); color:var(--dim); transition:all 0.2s; }
 .cbox.active { border-color:var(--accent-hover); color:#000000; background:var(--accent-hover); transform:scale(1.05); box-shadow:0 0 12px rgba(255,136,0,0.4); }
 
-/* ── DECODE OUTPUT ── */
+/* ── DECODE OUTPUT (Çözümlenen Metin Animasyonları) ── */
 .decode-out {
   background: var(--input-bg);
   border: 1px solid var(--border);
@@ -70,13 +87,13 @@ img.plot { width:100%; border:1px solid var(--border); border-radius:var(--radiu
   /* white-space: pre ile boşluklar korunur */
   white-space: pre-wrap;
 }
-/* Her karakter span'i — boşluk dahil */
+/* Her karakter span'i — boşluk dahil (Animasyonlu giriş yapar) */
 .decode-out .ch {
   display: inline;
   opacity: 0;
   animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
-/* Boşluk karakteri için görsel gösterge */
+/* Boşluk karakteri için görsel gösterge (Nokta işareti) */
 .decode-out .ch-space {
   display: inline-block;
   width: 0.55em;
@@ -101,21 +118,28 @@ img.plot { width:100%; border:1px solid var(--border); border-radius:var(--radiu
   to   { opacity:1; transform:scale(1);   color:#ffffff; }
 }
 
+/* Dosya Yükleme Alanı */
 .upload-z { border:2px dashed var(--border); border-radius:var(--radius); padding:40px 20px; text-align:center; cursor:pointer; transition:all 0.2s; background:var(--input-bg); }
 .upload-z:hover, .upload-z.drag { border-color:var(--accent); background:var(--accent-soft); }
 .upload-z .ico { font-size:32px; margin-bottom:12px; color:var(--accent); }
+
+/* Frekans Tablosu Tasarımı */
 table { width:100%; border-collapse:collapse; font-size:14px; }
 th { padding:12px 16px; text-align:left; font-size:12px; font-weight:600; text-transform:uppercase; color:var(--accent); border-bottom:2px solid var(--border); }
 td { padding:12px 16px; border-bottom:1px solid var(--border); color:var(--text); }
 tr:hover td { background:var(--input-bg); }
 td.cc { font-weight:600; color:#ffffff; }
 td.fc { font-family:monospace; color:var(--dim); }
+
+/* Sayfa Altı Durum Çubuğu (Status Bar) */
 .status { position:fixed; bottom:0; left:0; right:0; background:#000000; border-top:1px solid var(--border); padding:12px 24px; font-size:13px; font-weight:500; color:var(--dim); display:flex; align-items:center; gap:12px; z-index:100; }
 .dot { width:8px; height:8px; border-radius:50%; background:var(--dim); flex-shrink:0; }
-.dot.a { background:var(--accent); animation:pulse 1.5s infinite; }
-.dot.e { background:#e74c3c; }
-.dot.s { background:var(--accent2); }
+.dot.a { background:var(--accent); animation:pulse 1.5s infinite; } /* Aktif/İşlem yapıyor */
+.dot.e { background:#e74c3c; } /* Hata */
+.dot.s { background:var(--accent2); } /* Başarılı */
 @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(255,94,0,0.5);}70%{box-shadow:0 0 0 6px rgba(255,94,0,0);}100%{box-shadow:0 0 0 0 rgba(255,94,0,0);} }
+
+/* Audio Elementi Renk Filtresi (Temaya Uydurmak İçin) */
 audio { width:100%; margin-top:16px; outline:none; border-radius:var(--radius); opacity:0.8; filter:sepia(100%) hue-rotate(345deg) saturate(300%) brightness(0.9) contrast(1.2) invert(1); }
 
 /* Ham metin göstergesi (boşluk gizlenmeden) */
@@ -147,7 +171,6 @@ audio { width:100%; margin-top:16px; outline:none; border-radius:var(--radius); 
     <button class="tb" onclick="tab('freqtable',this)">Frekans Haritası</button>
   </div>
 
-  <!-- ENCODE TAB -->
   <div class="panel active" id="tab-encode">
     <div class="card">
       <div class="clabel">Türkçe Metin Girişi</div>
@@ -176,7 +199,6 @@ audio { width:100%; margin-top:16px; outline:none; border-radius:var(--radius); 
     </div>
   </div>
 
-  <!-- DECODE TAB -->
   <div class="panel" id="tab-decode">
     <div class="card">
       <div class="clabel">WAV Dosyası Yükle</div>
@@ -197,11 +219,8 @@ audio { width:100%; margin-top:16px; outline:none; border-radius:var(--radius); 
 
     <div class="card">
       <div class="clabel">Çözümlenen Metin</div>
-      <!-- Animasyonlu karakter gösterimi — boşluklar · ile işaretlenir -->
       <div class="decode-out" id="dec-out"></div>
-      <!-- Ham metin (kopyalanabilir, gerçek boşluklu) -->
       <div class="decode-raw" id="dec-raw" style="display:none"></div>
-
     </div>
 
     <div class="card">
@@ -210,7 +229,6 @@ audio { width:100%; margin-top:16px; outline:none; border-radius:var(--radius); 
     </div>
   </div>
 
-  <!-- FREQ TABLE TAB -->
   <div class="panel" id="tab-freqtable">
     <div class="card">
       <div class="clabel">Karakter / Frekans Atamaları</div>
@@ -241,6 +259,7 @@ audio { width:100%; margin-top:16px; outline:none; border-radius:var(--radius); 
 </div>
 
 <script>
+// Global değişkenler: Son oluşturulan WAV verisini ve seçilen dosyayı tutar
 let lastWavB64 = null;
 let selectedFile = null;
 
@@ -249,11 +268,14 @@ const TR_MAP = {'a':'A','b':'B','c':'C','ç':'Ç','d':'D','e':'E','f':'F','g':'G
                 'ğ':'Ğ','h':'H','ı':'I','i':'İ','j':'J','k':'K','l':'L','m':'M',
                 'n':'N','o':'O','ö':'Ö','p':'P','r':'R','s':'S','ş':'Ş','t':'T',
                 'u':'U','ü':'Ü','v':'V','y':'Y','z':'Z'};
+
 function trUpper(str) {
+  /* Girilen string'i karakter karakter haritadan geçirir, bulamazsa normal toUpperCase() yapar */
   return [...str].map(c => TR_MAP[c] || c.toUpperCase()).join('');
 }
 
 function tab(id, btn) {
+  /* Sekmeler arası geçişi sağlar. Tıklananı aktif, diğerlerini pasif yapar. */
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tb').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-' + id).classList.add('active');
@@ -261,17 +283,21 @@ function tab(id, btn) {
 }
 
 function setStatus(msg, type) {
+  /* Alttaki durum çubuğunun (Status Bar) yazısını ve ışık rengini (a=aktif, e=hata, s=başarılı) değiştirir */
   document.getElementById('stxt').textContent = msg;
   const d = document.getElementById('sdot');
   d.className = 'dot' + (type ? ' ' + type : '');
 }
 
-/* ── ENCODE ── */
+/* ── ENCODE (Metni Sese Çevir) ── */
 async function doEncode() {
   const text = document.getElementById('enc-input').value.trim();
   if (!text) { setStatus('Lütfen bir metin girin.', 'e'); return; }
+  
   setStatus('Sinyal sentezleniyor...', 'a');
+  
   try {
+    // Flask /encode endpoint'ine POST isteği at
     const res = await fetch('/encode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -280,9 +306,11 @@ async function doEncode() {
     const data = await res.json();
     if (data.error) { setStatus(data.error, 'e'); return; }
 
+    // Dönen verileri arayüze yerleştir
     lastWavB64 = data.wav_b64;
     document.getElementById('dl-btn').disabled = false;
 
+    // Base64 formatında gelen Matplotlib grafiklerini img etiketlerine aktar
     const wi = document.getElementById('wave-img');
     wi.src = 'data:image/png;base64,' + data.wave_img;
     wi.style.display = 'block';
@@ -291,36 +319,46 @@ async function doEncode() {
     si.src = 'data:image/png;base64,' + data.spec_img;
     si.style.display = 'block';
 
+    // Üretilen sesi çalabilmek için audio elementine bağla
     const ap = document.getElementById('audio-player');
     ap.src = 'data:audio/wav;base64,' + data.wav_b64;
     ap.style.display = 'block';
 
+    // Ses çalarken eşzamanlı olarak yanan karakter kutularını oluştur
     const boxes = document.getElementById('char-boxes');
     boxes.innerHTML = '';
     const boxEls = data.chars.map(c => {
       const b = document.createElement('div');
       b.className = 'cbox';
       b.textContent = c.ch;
-      b.title = `${c.fl}Hz + ${c.fh}Hz`;
+      b.title = `${c.fl}Hz + ${c.fh}Hz`; // Üzerine gelince frekansları gösterir
       boxes.appendChild(b);
       return b;
     });
 
     const totalMs = data.duration_ms;
+    
+    // Sesin süresine (duration_ms) orantılı olarak kutuları sırayla aktif et (Timeline efekti)
     boxEls.forEach((b, i) => {
       setTimeout(() => {
         boxEls.forEach(x => x.classList.remove('active'));
         b.classList.add('active');
+        // Alttaki progress bar'ı ilerlet
         document.getElementById('prog-bar').style.width = ((i + 1) / boxEls.length * 100) + '%';
       }, i * (totalMs / boxEls.length));
     });
+    
+    // İşlem bitince son kutunun aktifliğini kaldır
     setTimeout(() => boxEls.forEach(x => x.classList.remove('active')), totalMs + 200);
 
     setStatus(`Sentezleme başarılı. Toplam: ${data.num_chars} karakter, Süre: ${data.duration_ms}ms`, 's');
-  } catch (e) { setStatus('Sunucu Hatası: ' + e, 'e'); }
+  } catch (e) { 
+    setStatus('Sunucu Hatası: ' + e, 'e'); 
+  }
 }
 
 function downloadWav() {
+  /* Encode işlemiyle üretilen sesi cihazına indirmesini sağlar */
   if (!lastWavB64) return;
   const a = document.createElement('a');
   a.href = 'data:audio/wav;base64,' + lastWavB64;
@@ -329,8 +367,9 @@ function downloadWav() {
   setStatus('WAV dosyası indirildi.', 's');
 }
 
-/* ── DECODE ── */
+/* ── DECODE (Sesi Metne Çevir) ── */
 function pickFile(e) {
+  /* Tıklayarak bilgisayardan dosya seçildiğinde çalışır */
   selectedFile = e.target.files[0];
   if (selectedFile) {
     document.getElementById('upz').innerHTML =
@@ -341,6 +380,7 @@ function pickFile(e) {
 }
 
 function dropF(e) {
+  /* Sürükle-Bırak yöntemiyle dosya yüklendiğinde çalışır */
   e.preventDefault();
   document.getElementById('upz').classList.remove('drag');
   selectedFile = e.dataTransfer.files[0];
@@ -353,13 +393,17 @@ function dropF(e) {
 }
 
 async function decodeEncoded() {
+  /* Kullanıcının yeni dosya yüklemesine gerek kalmadan, az önce Encode ettiği sesi doğrudan Decode eder */
   if (!lastWavB64) { setStatus('Lütfen önce Encode sekmesinden bir sinyal üretin.', 'e'); return; }
+  
+  // Base64 verisini File objesine çeviriyoruz ki form datası olarak yollayabilelim
   const blob = b64ToBlob(lastWavB64, 'audio/wav');
   selectedFile = new File([blob], 'encoded.wav', { type: 'audio/wav' });
   await doDecode();
 }
 
 function b64ToBlob(b64, type) {
+  /* Base64 verisini raw binary (Blob) verisine dönüştüren yardımcı fonksiyon */
   const bin = atob(b64);
   const arr = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
@@ -368,16 +412,22 @@ function b64ToBlob(b64, type) {
 
 async function doDecode() {
   if (!selectedFile) { setStatus('Lütfen analiz edilecek bir WAV dosyası seçin.', 'e'); return; }
+  
   setStatus('Sinyal çözümleniyor...', 'a');
+  
+  // Dosyayı sunucuya göndermek için FormData kullanıyoruz (multipart/form-data)
   const fd = new FormData();
   fd.append('file', selectedFile);
+  
   try {
     const res = await fetch('/decode', { method: 'POST', body: fd });
     const data = await res.json();
     if (data.error) { setStatus(data.error, 'e'); return; }
 
+    // Dönen metni ekrana animasyonlu bas
     renderDecodeOutput(data.text);
 
+    // Goertzel algoritmasının oluşturduğu grafik varsa ekrana yansıt
     if (data.goertzel_img) {
       const gi = document.getElementById('goertzel-img');
       gi.src = 'data:image/png;base64,' + data.goertzel_img;
@@ -385,14 +435,16 @@ async function doDecode() {
     }
 
     setStatus(`Çözümleme tamamlandı. ${data.num_detected} karakter tespit edildi.`, 's');
-  } catch (e) { setStatus('Sunucu Hatası: ' + e, 'e'); }
+  } catch (e) { 
+    setStatus('Sunucu Hatası: ' + e, 'e'); 
+  }
 }
 
 /**
  * Decode çıktısını karakter karakter animasyonlu gösterir.
  * - Boşluk karakterleri görsel nokta (·) ile işaretlenir
  * - Üst üste aynı karakterler de ayrı ayrı gösterilir
- *   (her span'e farklı animationDelay verilir)
+ * (her span'e farklı animationDelay verilir)
  * - Ham metin altta kopyalanabilir olarak gösterilir
  */
 function renderDecodeOutput(text) {
@@ -405,17 +457,21 @@ function renderDecodeOutput(text) {
   rawEl.style.display = 'block';
 
   // Karakter karakter animasyonlu gösterim
-  const chars = [...text];   // Unicode'u doğru böl
+  const chars = [...text];   // Unicode'u doğru böl (emoji vs. varsa patlamaması için modern yöntem)
+  
   chars.forEach((ch, i) => {
-    const delay = i * 60;    // Her karakter 60ms gecikmeli — üst üste aynı da ayrı görünür
+    // Her karaktere 60ms gecikme ver (Daktilo efekti / popIn animasyonu için)
+    const delay = i * 60;    
 
     if (ch === ' ') {
+      // Boşluklar arka planda yer kaplasın ama görsel olarak '·' göstersin
       const spaceWrap = document.createElement('span');
       spaceWrap.className = 'ch-space';
       spaceWrap.style.animationDelay = delay + 'ms';
       spaceWrap.title = 'BOŞLUK karakteri';
       outEl.appendChild(spaceWrap);
     } else {
+      // Normal karakterler
       const s = document.createElement('span');
       s.className = 'ch';
       s.textContent = ch;
