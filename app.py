@@ -329,12 +329,7 @@ _dir = os.path.dirname(os.path.abspath(__file__))
 with open(os.path.join(_dir, "index.html"), "r", encoding="utf-8") as f:
     HTML_TEMPLATE = f.read()
 
-application = app
+application = app # Bu satır zaten kodunda var, Gunicorn buna bakacak.
 
 if __name__ == '__main__':
-    print("\n" + "="*63)
-    print("  BIL216 DTMF Uygulaması — Siyah/Turuncu Flask Sunucusu")
-    print("="*63)
-    print("  Tarayıcıda açın: http://127.0.0.1:5000")
-    print("="*63 + "\n")
-    app.run(debug=True, port=5000)
+    app.run(debug=True)
